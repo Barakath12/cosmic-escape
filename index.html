@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cosmic Escape</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: black;
+            color: white;
+            text-align: center;
+        }
+
+        #game-container {
+            position: relative;
+            margin: auto;
+            width: 300px;
+            height: 500px;
+            border: 2px solid white;
+            overflow: hidden;
+        }
+
+        #game-area {
+            position: relative;
+            width: 100%;
+            height: 100%;
+            background: url('https://example.com/space-background.jpg') no-repeat center center;
+            background-size: cover;
+        }
+
+        #player {
+            position: absolute;
+            bottom: 20px;
+            left: 50%;
+            width: 30px;
+            height: 30px;
+            background-color: blue;
+            border-radius: 50%;
+            transform: translateX(-50%);
+        }
+
+        #enemy {
+            position: absolute;
+            top: 0;
+            left: 50%;
+            width: 30px;
+            height: 30px;
+            background-color: red;
+            border-radius: 50%;
+        }
+
+        #start-button {
+            margin-top: 20px;
+            padding: 10px 20px;
+            font-size: 16px;
+        }
+    </style>
+</head>
+<body>
+    <div id="game-container">
+        <h1>Cosmic Escape</h1>
+        <div id="score">Score: 0</div>
+        <div id="game-area">
+            <div id="player"></div>
+            <div id="enemy"></div>
+        </div>
+        <button id="start-button">Start Game</button>
+    </div>
+    <script>
+        let score = 0;
+        let gameInterval;
+        let enemyInterval;
+        const player = document.getElementById('player');
+        const enemy = document.getElementById('enemy');
+        const scoreDisplay = document.getElementById('score');
+        const startButton = document.getElementById('start-button');
+
+        function startGame() {
+            score = 0;
+            scoreDisplay.innerText = `Score: ${score}`;
+            player.style.left = '50%';
+            player.style.bottom = '20px';
+            enemy.style.top = '0';
+            enemy.style.left = `${Math.random() * 100}%`;
+            
+            gameInterval = setInterval(moveEnemy, 100);
+            enemyInterval = setInterval(spawnEnemy, 2000);
+        }
+
+        function moveEnemy() {
+            const enemyTop = parseInt(window.getComputedStyle(enemy).getPropertyValue('top'));
+            if (enemyTop < 500) {
+                enemy.style.top = `${enemyTop + 5}px`;
+            } else {
+                enemy.style.top = '0';
+                enemy.style.left = `${Math.random() * 100}%`;
+                score++;
+                scoreDisplay.innerText = `Score: ${score}`;
+            }
+            checkCollision();
+        }
+
+        function spawnEnemy() {
+            enemy.style.left = `${Math.random() * 100}%`;
+        }
+
+        function checkCollision() {
+            const playerRect = player.getBoundingClientRect();
+            const enemyRect = enemy.getBoundingClientRect();
+            
+            if (
+                playerRect.x < enemyRect.x + enemyRect.width &&
+                playerRect.x + playerRect.width > enemyRect.x &&
+                playerRect.y < enemyRect.y + enemyRect.height &&
+                playerRect.y + playerRect.height > enemyRect.y
+            ) {
+                endGame();
+            }
+        }
+
+        function endGame() {
+            clearInterval(gameInterval);
+            clearInterval(enemyInterval);
+            alert(`Game Over! Your score: ${score}`);
+        }
+
+        document.addEventListener('keydown', (event) => {
+            const playerLeft = parseInt(window.getComputedStyle(player).getPropertyValue('left'));
+            if (event.key === 'ArrowLeft' && playerLeft > 0) {
+                player.style.left = `${playerLeft - 10}px`;
+            } else if (event.key === 'ArrowRight' && playerLeft < 270) {
+                player.style.left = `${playerLeft + 10}px`;
+            }
+        });
+
+        startButton.addEventListener('click', startGame);
+    </script>
+</body>
+</html>
